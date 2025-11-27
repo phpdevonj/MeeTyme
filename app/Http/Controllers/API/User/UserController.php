@@ -136,7 +136,7 @@ class UserController extends Controller {
         $input['display_name'] = $input['first_name'] . ' ' . $input['last_name'];
         $input['password'] = Hash::make($input['password']);
         // $input['status'] = in_array($input['user_type'], ['provider', 'handyman']) ? ($input['status'] ?? 0) : 1;
-        $input['status'] = 1;
+        $input['status'] = $input['user_type'] == 'provider' ? 0 : 1;
         $username = $input['username'];
         $email = $input['email'];
         $userType = $input['user_type'];
@@ -261,7 +261,7 @@ class UserController extends Controller {
         Stripe::setApiKey($val['stripe_key']);
 
         try {
-           
+
 
             // Prepare account data
             $accountData = [
@@ -343,13 +343,13 @@ class UserController extends Controller {
 
         if (Auth::attempt(['email' => request('email'), 'password' => request('password'), 'user_type' => request('login_type')])) {
             $user = Auth::user();
-            
+
             // Check if email is verified
             if ($user->is_email_verified != 1) {
                 Auth::logout();
                 return comman_message_response('Please verify your email before logging in.', 403);
             }
-            
+
             // Set FCM token
             $user->fcm_token = $request->input('fcm_token');
             if (request('loginfrom') === 'vue-app') {
@@ -439,22 +439,22 @@ class UserController extends Controller {
         // Attempt login
         if (Auth::attempt(['email' => $email, 'password' => $password, 'user_type' => $user_type])) {
             $user = Auth::user();
-            
+
             // Check if email is verified
             if ($user->is_email_verified != 1) {
                 Auth::logout();
-                
+
                 // Generate and send OTP
                 $otp = rand(1000, 9999);
                 $user->otp = $otp;
                 $user->save();
-                
+
                 try {
                     \Mail::to($user->email)->send(new OtpMail($otp));
                 } catch (\Exception $e) {
                     // Mail failure fallback
                 }
-                
+
                 return comman_message_response(__('auth.email_not_verified'), 403);
             }
         } else {
@@ -470,13 +470,13 @@ class UserController extends Controller {
                     $otp = rand(1000, 9999);
                     $existingOtherUser->otp = $otp;
                     $existingOtherUser->save();
-                    
+
                     try {
                         \Mail::to($existingOtherUser->email)->send(new OtpMail($otp));
                     } catch (\Exception $e) {
                         // Mail failure fallback
                     }
-                    
+
                     return comman_message_response(__('auth.email_not_verified'), 403);
                 }
 
@@ -489,7 +489,7 @@ class UserController extends Controller {
                 $newUser->status = 1;
                 $newUser->save();
 
-               
+
                 if ($user_type == 'provider') {
                     $providerType = ProviderType::where('name', 'LIKE', '%freelance%')->first();
                     if ($providerType) {
@@ -528,16 +528,16 @@ class UserController extends Controller {
                     $otp = rand(1000, 9999);
                     $newUser->otp = $otp;
                     $newUser->save();
-                    
+
                     try {
                         \Mail::to($newUser->email)->send(new OtpMail($otp));
                     } catch (\Exception $e) {
                         // Mail failure fallback
                     }
-                    
+
                     return comman_message_response(__('auth.email_not_verified'), 403);
                 }
-                
+
                 // Token & response
                 $newUser->api_token = $newUser->createToken('auth_token')->plainTextToken;
                 unset($newUser['otp']);
