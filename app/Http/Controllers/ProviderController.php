@@ -11,6 +11,7 @@ use App\Models\ProviderPayout;
 use App\Models\ProviderSubscription;
 use App\Models\PaymentGateway;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\DataTables;
 use Hash;
 use App\Models\Setting;
@@ -338,6 +339,22 @@ class ProviderController extends Controller {
             return comman_message_response($msg);
         }
         return comman_custom_response(['message' => $msg, 'status' => true]);
+    }
+
+    public function commission(Request $request) {
+        $id = $request->id;
+        $provider = User::withTrashed()->where('id', $id)->first();
+        if (!$provider) {
+            $msg = __('messages.not_found_entry', ['name' => __('messages.provider')]);
+        }
+        $msg = __('messages.commission_updated');
+        $provider->update(['commission_type' => $request->type, 'commission' => $request->commission]);
+
+        if (request()->is('api/*')) {
+            return comman_message_response($msg);
+        }
+        Session::flash('success', $msg);
+        return redirect()->back();
     }
 
     public function bankDetails(ServiceDataTable $dataTable, Request $request) {

@@ -841,10 +841,10 @@
     'password_reset_success' => 'Password reset successfully',
     'received' => 'Received',
     'accepted' => 'Accepted',
-    'discounted_price'=>'Discounted Price',
-    'service_fee' =>'Service Fee',
-    'users_last_3_days'=>'Users in Last 3 Days',
-    'provider_pay_due'=>'Provider Pay Due'
-
+    'discounted_price' => 'Discounted Price',
+    'service_fee' => 'Service Fee',
+    'users_last_3_days' => 'Users in Last 3 Days',
+    'provider_pay_due' => 'Provider Pay Due',
+    'commission_updated' => 'Commission Updated',
 )
 ?>

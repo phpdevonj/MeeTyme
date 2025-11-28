@@ -17,9 +17,9 @@
         <!-- <li class="nav-item {{request()->routeIs('handyman.show') ? 'active' : ''}}">
             <a class="nav-link" href="{{ route('handyman.show',$providerdata->id) }}">{{__('messages.handyman')}}</a>
         </li> -->
-        <!-- <li class="nav-item {{request()->routeIs('setting.comission') ? 'active' : ''}}">
+        <li class="nav-item {{request()->routeIs('setting.comission') ? 'active' : ''}}">
             <a class="nav-link" href="{{ route('setting.comission',$providerdata->id) }}">{{__('messages.Settings')}}</a>
-        </li> -->
+        </li>
         <!-- <li class="nav-item {{request()->routeIs('bank.show') ? 'active' : ''}}">
             <a class="nav-link" href="{{ route('bank.show',$providerdata->id) }}">{{__('messages.Bank_info')}}</a>
         </li> -->

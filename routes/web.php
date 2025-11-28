@@ -123,6 +123,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::get('provider/approve/{id}', [ProviderController::class, 'approve'])->name('provider.approve');
         Route::post('provider-action', [ProviderController::class, 'action'])->name('provider.action');
         // Route::post('provider/{id}', [ProviderController::class, 'destroy'])->name('provider.destroy');
+         Route::post('provider-commission/{id}', [ProviderController::class, 'commission'])->name('provider.commission');
         Route::post('provider-bulk-action', [ProviderController::class, 'bulk_action'])->name('provider.bulk-action');
     });
 
