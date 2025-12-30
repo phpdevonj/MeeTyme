@@ -221,7 +221,15 @@ class BookingController extends Controller {
         }
         $service_data = Service::find($data['service_id']);
 
-        $data['provider_id'] = !empty($data['provider_id']) ? $data['provider_id'] : $service_data->provider_id;
+
+        $latitude = $data['latitude'];
+        $longitude = $data['longitude'];
+        $provider = User::where(['user_type' => 'provider'])
+            ->isWithinMaxDistance($latitude, $longitude)
+            ->inRandomOrder()->first();
+
+//        $data['provider_id'] = !empty($data['provider_id']) ? $data['provider_id'] : $service_data->provider_id;
+        $data['provider_id'] = $provider->id;
 
         if ($request->has('tax') && $request->tax != null) {
             $data['tax'] = json_encode($request->tax);

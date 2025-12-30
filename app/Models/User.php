@@ -27,7 +27,7 @@ class User extends Authenticatable implements HasMedia {
         'login_type', 'service_address_id', 'uid', 'is_subscribe',
         'social_image', 'is_available', 'designation', 'last_online_time', 'stripe_account_id',
         'known_languages', 'skills', 'description', 'why_choose_me', 'is_email_verified', 'language', 'fcm_token',
-        'commission_type', 'commission'
+        'commission_type', 'commission', 'latitude', 'longitude'
     ];
 
     /**
@@ -257,4 +257,27 @@ class User extends Authenticatable implements HasMedia {
     public function addresses() {
         return $this->hasMany(UserAddress::class);
     }
+
+
+    /**
+     * @param $query object query object
+     * @param $lat integer positive and negative number
+     * @param $lng integer positive and negative number
+     * @param $radius int in kilometer
+     * @return mixed
+     */
+    public function scopeIsWithinMaxDistance($query, $lat, $lng, $radius = 25) {
+        $haversine = "(6371 * acos(cos(radians($lat))
+                    * cos(radians(latitude))
+                    * cos(radians(longitude) - radians($lng))
+                    + sin(radians($lat))
+                    * sin(radians(latitude))))";
+
+        return $query->selectRaw("*, $haversine AS distance")
+            ->where(function ($query) {
+                return $query->whereNotNull('latitude')->whereNotNull('longitude');
+            })
+            ->having('distance', '<', $radius);
+    }
+
 }

@@ -261,7 +261,7 @@ class BookingController extends Controller
             $duration_diff = $bookingdata->duration_diff;
             $duration_diff = $bookingdata->duration_diff;
 
-           
+
 
             // $provider_commission = optional($bookingdata->provider->providertype)->commission;
             // $provider_type = optional($bookingdata->provider->providertype)->type;
@@ -397,6 +397,34 @@ class BookingController extends Controller
 
         }
         $message = __('messages.update_form',[ 'form' => __('messages.booking') ] );
+
+
+        // Once booking is updated as usual, check if status is rejected
+        if($data['status'] == 'rejected') {
+            // check user type
+
+            $authUser =  auth()->user();
+            if($authUser->user_type == 'provider') {
+                // check if user is provider, then assign new provider and send notification
+                $latitude = $bookingdata->latitude;
+                $longitude = $bookingdata->longitude;
+                $provider = User::where(['user_type' => 'provider'])
+                    ->isWithinMaxDistance($latitude, $longitude)
+                    ->whereNotIn('provider_id', [$bookingdata->provider_id])
+                    ->inRandomOrder()->first();
+
+                $bookingdata->update(['status' => 'pending', 'provider_id' => $provider->id]);
+
+                // send notification to new user
+                $activity_data = [
+                    'activity_type' => 'add_booking',
+                    'booking_id' => $id,
+                    'booking' => $bookingdata,
+                ];
+                $this->sendNotification($activity_data);
+            }
+
+        }
 
         if($request->is('api/*')) {
             return comman_message_response($message);
