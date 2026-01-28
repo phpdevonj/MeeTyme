@@ -551,6 +551,7 @@ class UserController extends Controller {
 
         //  Existing user login successful
         $user->fcm_token = $fcm_token;
+        $user->save();
         unset($user['otp']);
 
         // OTP
